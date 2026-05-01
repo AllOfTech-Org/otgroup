@@ -2,11 +2,570 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ═══════════════════════════════════════
+   THEME VARIABLES
+═══════════════════════════════════════ */
 :root {
-  --color-primary: 15 15 15;        /* near black — dark button */
-  --color-primary-dark: 0 0 0;      /* pure black on hover */
-  --color-bg-light: 243 244 246;    /* light gray background */
-  --color-card: 255 255 255;        /* white card */
-  --color-border: 226 232 240;      /* subtle border */
-  --color-text: 15 23 42;           /* near black text */
+  --color-primary: 15 15 15;
+  --color-primary-dark: 0 0 0;
+  --color-bg-light: 243 244 246;
+  --color-card: 255 255 255;
+  --color-border: 226 232 240;
+  --color-text: 15 23 42;
+}
+
+/* ═══════════════════════════════════════
+   PAGE BACKGROUND — image এর মতো blue gradient
+═══════════════════════════════════════ */
+.login-bg {
+  background: linear-gradient(135deg, #0d47a1 0%, #1565c0 30%, #1976d2 60%, #1e88e5 100%);
+}
+
+/* ═══════════════════════════════════════
+   ANIMATED BACKGROUND BLOBS
+═══════════════════════════════════════ */
+.blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(60px);
+  opacity: 0.25;
+  animation: floatBlob 8s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.blob-1 {
+  width: 400px;
+  height: 400px;
+  background: #42a5f5;
+  top: -80px;
+  left: -80px;
+  animation-delay: 0s;
+}
+
+.blob-2 {
+  width: 500px;
+  height: 500px;
+  background: #1a237e;
+  bottom: -100px;
+  right: -100px;
+  animation-delay: -3s;
+}
+
+.blob-3 {
+  width: 300px;
+  height: 300px;
+  background: #64b5f6;
+  bottom: 20%;
+  left: 10%;
+  animation-delay: -5s;
+}
+
+.blob-4 {
+  width: 250px;
+  height: 250px;
+  background: #0d47a1;
+  top: 30%;
+  right: 15%;
+  animation-delay: -2s;
+}
+
+/* ═══════════════════════════════════════
+   3D FLOATING SHAPES — image এর মতো
+═══════════════════════════════════════ */
+.shape {
+  position: absolute;
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+/* Wavy / Double-wave shapes */
+.shape-wavy {
+  width: 90px;
+  height: 90px;
+  background: linear-gradient(135deg, #64b5f6, #1e88e5);
+  border-radius: 40% 60% 60% 40% / 40% 40% 60% 60%;
+  box-shadow: inset 0 4px 16px rgba(255, 255, 255, 0.2), 0 8px 32px rgba(0, 0, 0, 0.2);
+}
+
+.shape-left-top {
+  top: 22%;
+  left: 8%;
+  animation: floatShape 7s ease-in-out infinite;
+  transform: rotate(-20deg);
+}
+
+.shape-left-bottom {
+  top: 35%;
+  left: 10%;
+  width: 70px;
+  height: 70px;
+  animation: floatShape 9s ease-in-out infinite;
+  animation-delay: -3s;
+  transform: rotate(30deg);
+  border-radius: 60% 40% 40% 60% / 60% 60% 40% 40%;
+}
+
+/* Spiral shapes */
+.shape-spiral {
+  width: 80px;
+  height: 80px;
+  background: linear-gradient(135deg, #90caf9, #42a5f5);
+  border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+  box-shadow: inset 0 4px 16px rgba(255, 255, 255, 0.15), 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+.shape-right-top {
+  top: 20%;
+  right: 10%;
+  animation: floatShape 8s ease-in-out infinite;
+  animation-delay: -1s;
+  transform: rotate(15deg);
+}
+
+.shape-right-bottom {
+  top: 40%;
+  right: 7%;
+  width: 55px;
+  height: 55px;
+  animation: floatShape 10s ease-in-out infinite;
+  animation-delay: -4s;
+  transform: rotate(-30deg);
+}
+
+/* Circle/donut shapes */
+.shape-circle {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  border: 14px solid rgba(100, 181, 246, 0.5);
+  background: transparent;
+  animation: floatShape 11s ease-in-out infinite;
+}
+
+.shape-bottom-left {
+  bottom: 18%;
+  left: 12%;
+  animation-delay: -6s;
+}
+
+.shape-top-right {
+  top: 12%;
+  right: 20%;
+  width: 80px;
+  height: 80px;
+  border-width: 10px;
+  animation-delay: -2s;
+}
+
+.shape-extra-1 {
+  width: 85px;
+  height: 85px;
+  bottom: 10%;
+  right: 25%;
+  animation: floatShape 9s ease-in-out infinite;
+  animation-delay: -7s;
+  transform: rotate(50deg);
+  border-radius: 50% 30% 60% 40% / 40% 60% 30% 50%;
+}
+
+.shape-extra-2 {
+  width: 60px;
+  height: 60px;
+  top: 8%;
+  left: 30%;
+  animation: floatShape 7s ease-in-out infinite;
+  animation-delay: -1.5s;
+  transform: rotate(-45deg);
+}
+
+.shape-extra-3 {
+  width: 85px;
+  height: 85px;
+  top: 60%;
+  left: 3%;
+  border-radius: 50%;
+  border: 12px solid rgba(100, 181, 246, 0.45);
+  background: transparent;
+  animation: floatShape 12s ease-in-out infinite;
+  animation-delay: -8s;
+}
+
+.shape-extra-4 {
+  width: 75px;
+  height: 75px;
+  bottom: 30%;
+  right: 5%;
+  animation: floatShape 6s ease-in-out infinite;
+  animation-delay: -4s;
+  transform: rotate(25deg);
+  border-radius: 35% 65% 55% 45% / 55% 35% 65% 45%;
+}
+
+/* ═══════════════════════════════════════
+   GLASS CARD
+═══════════════════════════════════════ */
+.glass-card {
+  position: relative;
+  z-index: 10;
+  width: 360px;
+  padding: 2rem 2rem 1.5rem;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(20px) saturate(1.5);
+  -webkit-backdrop-filter: blur(20px) saturate(1.5);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+/* Page open entry animation */
+.card-hidden {
+  opacity: 0;
+  transform: translateY(40px) scale(0.96);
+}
+
+.card-visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ═══════════════════════════════════════
+   STAGGERED FIELD ANIMATIONS
+═══════════════════════════════════════ */
+.field-hidden {
+  opacity: 0;
+  transform: translateY(16px);
+}
+
+.field-visible {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.field-delay-1 {
+  transition-delay: 0.15s;
+}
+
+.field-delay-2 {
+  transition-delay: 0.25s;
+}
+
+.field-delay-3 {
+  transition-delay: 0.35s;
+}
+
+.field-delay-4 {
+  transition-delay: 0.45s;
+}
+
+.field-delay-5 {
+  transition-delay: 0.55s;
+}
+
+.field-delay-6 {
+  transition-delay: 0.65s;
+}
+
+/* ═══════════════════════════════════════
+   LOGO AREA
+═══════════════════════════════════════ */
+.logo-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 1.2rem;
+  gap: 6px;
+}
+
+.logo-icon {
+  width: 48px;
+  height: 48px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.logo-text {
+  color: white;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.03em;
+}
+
+/* ═══════════════════════════════════════
+   LOGIN TITLE
+═══════════════════════════════════════ */
+.login-title {
+  color: white;
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 1.2rem;
+}
+
+/* ═══════════════════════════════════════
+   FORM FIELDS
+═══════════════════════════════════════ */
+.field-group {
+  margin-bottom: 0.9rem;
+}
+
+.field-label {
+  display: block;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 12px;
+  margin-bottom: 5px;
+  letter-spacing: 0.02em;
+}
+
+.input-wrapper {
+  position: relative;
+}
+
+.glass-input {
+  width: 100%;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  font-size: 13px;
+  outline: none;
+  transition: background 0.2s, border-color 0.2s, box-shadow 0.2s;
+  box-sizing: border-box;
+}
+
+.glass-input::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.glass-input:focus {
+  background: rgba(255, 255, 255, 0.25);
+  border-color: rgba(255, 255, 255, 0.55);
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
+}
+
+.input-with-icon .glass-input {
+  padding-right: 40px;
+}
+
+.eye-btn {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: rgba(255, 255, 255, 0.6);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  transition: color 0.2s;
+}
+
+.eye-btn:hover {
+  color: white;
+}
+
+/* ═══════════════════════════════════════
+   FORGOT PASSWORD
+═══════════════════════════════════════ */
+.forgot-row {
+  text-align: right;
+  margin-bottom: 0.8rem;
+  margin-top: -0.3rem;
+}
+
+.forgot-btn {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 12px;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.forgot-btn:hover {
+  color: white;
+}
+
+/* ═══════════════════════════════════════
+   ROLE SELECTOR
+═══════════════════════════════════════ */
+.role-selector {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 1rem;
+}
+
+.role-btn {
+  flex: 1;
+  padding: 9px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 500;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.75);
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.role-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+}
+
+.role-active {
+  background: white !important;
+  color: #1565c0 !important;
+  border-color: white !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* ═══════════════════════════════════════
+   SIGN IN BUTTON
+═══════════════════════════════════════ */
+.signin-btn {
+  width: 100%;
+  padding: 11px;
+  border-radius: 10px;
+  background: #1a237e;
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  letter-spacing: 0.02em;
+  transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+  margin-bottom: 1rem;
+}
+
+.signin-btn:hover {
+  background: #283593;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+  transform: translateY(-1px);
+}
+
+.signin-btn:active {
+  transform: translateY(0);
+}
+
+/* ═══════════════════════════════════════
+   DIVIDER
+═══════════════════════════════════════ */
+.divider-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 1rem;
+}
+
+.divider-line {
+  flex: 1;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.divider-text {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+/* ═══════════════════════════════════════
+   SOCIAL BUTTONS
+═══════════════════════════════════════ */
+.social-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 1.2rem;
+}
+
+.social-btn {
+  flex: 1;
+  padding: 10px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.15s, border-color 0.2s;
+}
+
+.social-btn:hover {
+  background: rgba(255, 255, 255, 0.25);
+  border-color: rgba(255, 255, 255, 0.45);
+  transform: translateY(-2px);
+}
+
+.social-btn:active {
+  transform: translateY(0);
+}
+
+/* ═══════════════════════════════════════
+   REGISTER LINK
+═══════════════════════════════════════ */
+.register-row {
+  text-align: center;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.register-link {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  transition: opacity 0.2s;
+}
+
+.register-link:hover {
+  opacity: 0.8;
+}
+
+/* ═══════════════════════════════════════
+   KEYFRAME ANIMATIONS
+═══════════════════════════════════════ */
+@keyframes floatBlob {
+  0% {
+    transform: translate(0, 0) scale(1);
+  }
+
+  33% {
+    transform: translate(20px, -30px) scale(1.05);
+  }
+
+  66% {
+    transform: translate(-15px, 15px) scale(0.97);
+  }
+
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+}
+
+@keyframes floatShape {
+  0% {
+    transform: translateY(0px) rotate(0deg);
+  }
+
+  50% {
+    transform: translateY(-18px) rotate(8deg);
+  }
+
+  100% {
+    transform: translateY(0px) rotate(0deg);
+  }
 }

@@ -1,4 +1,14 @@
+import { useState, useEffect } from "react";
+
 export default function Dashboard() {
+  const [mounted, setMounted] = useState(false);
+  const [activeNav, setActiveNav] = useState("Overview");
+
+  useEffect(() => {
+    const t = setTimeout(() => setMounted(true), 60);
+    return () => clearTimeout(t);
+  }, []);
+
   const activities = [
     { title: "Updated inventory counts after receiving supplier shipment", meta: "Inventory · Warehouse · 2026-04-29" },
     { title: "Uploaded packing list for INV-24031", meta: "Documents · Invoices · 2026-04-15" },
@@ -21,145 +31,557 @@ export default function Dashboard() {
     { label: "Role", sub: "Simulated access level", badge: "Staff", badgeClass: "gray", value: "Staff", note: "Finance actions are limited in Payments.", large: true },
   ];
 
-  const badgeStyle = {
-    green: "bg-green-100 text-green-800 border border-green-200",
-    gray: "bg-gray-100 text-gray-600 border border-borderColor",
-    orange: "bg-orange-100 text-orange-800 border border-orange-200",
-  };
-
-  const dotColor = {
-    green: "bg-green-500",
-    gray: "bg-gray-400",
-    orange: "bg-orange-500",
-  };
+  const navItems = ["Overview", "Buyers", "Workers", "Inventory", "Invoices", "Payments", "Documents"];
 
   return (
-    <div className="flex min-h-screen bg-bgLight">
+    <>
+      <style>{`
+        /* ── Global reset for dashboard ── */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
 
-      {/* SIDEBAR */}
-      <aside className="w-56 min-w-[220px] bg-card border-r border-borderColor flex flex-col">
-        <div className="flex items-center gap-2.5 p-4 pb-3">
-          <div className="w-9 h-9 bg-textMain rounded-lg" />
-          <div>
-            <p className="text-sm font-medium">AllOfTech Export Shipping</p>
-            <span className="text-xs text-gray-400">Management Dashboard</span>
-          </div>
-        </div>
+        .dash-root {
+          display: flex;
+          min-height: 100vh;
+          background: linear-gradient(135deg, #0d47a1 0%, #1565c0 30%, #1976d2 60%, #1e88e5 100%);
+          position: relative;
+          overflow: hidden;
+          font-family: 'Segoe UI', system-ui, sans-serif;
+        }
 
-        <p className="px-4 py-2 text-[10px] uppercase tracking-widest text-gray-400 font-medium">Workspace</p>
+        /* ── Background blobs ── */
+        .dash-blob {
+          position: fixed;
+          border-radius: 50%;
+          filter: blur(70px);
+          opacity: 0.18;
+          pointer-events: none;
+          animation: dashBlob 10s ease-in-out infinite;
+          z-index: 0;
+        }
+        .dash-blob-1 { width: 500px; height: 500px; background: #42a5f5; top: -120px; left: -100px; animation-delay: 0s; }
+        .dash-blob-2 { width: 600px; height: 600px; background: #1a237e; bottom: -150px; right: -120px; animation-delay: -4s; }
+        .dash-blob-3 { width: 350px; height: 350px; background: #64b5f6; bottom: 20%; left: 20%; animation-delay: -7s; }
+        .dash-blob-4 { width: 280px; height: 280px; background: #0d47a1; top: 40%; right: 25%; animation-delay: -2s; }
 
-        <nav className="flex-1 px-2">
-          {["Overview","Buyers","Workers","Inventory","Invoices","Payments","Documents"].map((item) => (
-            <div key={item} className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm cursor-pointer mb-0.5 ${item === "Overview" ? "bg-bgLight text-textMain font-medium" : "text-gray-500 hover:bg-bgLight"}`}>
-              {item}
-            </div>
-          ))}
-        </nav>
+        @keyframes dashBlob {
+          0%   { transform: translate(0,0) scale(1); }
+          33%  { transform: translate(20px,-25px) scale(1.04); }
+          66%  { transform: translate(-15px,15px) scale(0.97); }
+          100% { transform: translate(0,0) scale(1); }
+        }
 
-        <div className="p-3 border-t border-borderColor">
-          <div className="flex items-center gap-2.5 p-2 rounded-xl border border-borderColor mb-2">
-            <div className="w-8 h-8 rounded-full bg-bgLight border border-borderColor" />
+        /* ── Sidebar ── */
+        .dash-sidebar {
+          width: 220px;
+          min-width: 220px;
+          display: flex;
+          flex-direction: column;
+          position: relative;
+          z-index: 10;
+          background: rgba(255,255,255,0.10);
+          backdrop-filter: blur(20px);
+          -webkit-backdrop-filter: blur(20px);
+          border-right: 1px solid rgba(255,255,255,0.18);
+          transform: translateX(-30px);
+          opacity: 0;
+          transition: transform 0.7s cubic-bezier(0.22,1,0.36,1), opacity 0.7s ease;
+        }
+        .dash-sidebar.visible {
+          transform: translateX(0);
+          opacity: 1;
+        }
+
+        .sidebar-brand {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          padding: 18px 16px 14px;
+          border-bottom: 1px solid rgba(255,255,255,0.12);
+        }
+        .brand-icon {
+          width: 36px; height: 36px;
+          background: rgba(255,255,255,0.2);
+          border-radius: 10px;
+          border: 1px solid rgba(255,255,255,0.3);
+          flex-shrink: 0;
+        }
+        .brand-name {
+          font-size: 12px;
+          font-weight: 600;
+          color: white;
+          line-height: 1.3;
+        }
+        .brand-sub {
+          font-size: 10px;
+          color: rgba(255,255,255,0.55);
+        }
+
+        .sidebar-section-label {
+          padding: 14px 16px 6px;
+          font-size: 10px;
+          text-transform: uppercase;
+          letter-spacing: 0.12em;
+          color: rgba(255,255,255,0.4);
+          font-weight: 600;
+        }
+
+        .sidebar-nav { flex: 1; padding: 4px 10px; }
+
+        .nav-item {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          padding: 9px 12px;
+          border-radius: 10px;
+          font-size: 13px;
+          cursor: pointer;
+          margin-bottom: 2px;
+          color: rgba(255,255,255,0.65);
+          transition: background 0.2s, color 0.2s;
+          border: 1px solid transparent;
+        }
+        .nav-item:hover {
+          background: rgba(255,255,255,0.1);
+          color: white;
+        }
+        .nav-item.active {
+          background: rgba(255,255,255,0.18);
+          color: white;
+          font-weight: 600;
+          border-color: rgba(255,255,255,0.2);
+        }
+
+        .sidebar-footer {
+          padding: 12px;
+          border-top: 1px solid rgba(255,255,255,0.12);
+        }
+        .user-card {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          padding: 8px 10px;
+          border-radius: 12px;
+          border: 1px solid rgba(255,255,255,0.18);
+          background: rgba(255,255,255,0.08);
+          margin-bottom: 8px;
+        }
+        .user-avatar {
+          width: 30px; height: 30px;
+          border-radius: 50%;
+          background: rgba(255,255,255,0.2);
+          border: 1px solid rgba(255,255,255,0.3);
+          flex-shrink: 0;
+        }
+        .user-name { font-size: 12px; font-weight: 600; color: white; }
+        .user-role { font-size: 10px; color: rgba(255,255,255,0.5); }
+        .footer-btns { display: flex; gap: 6px; }
+        .footer-btn {
+          flex: 1;
+          font-size: 11px;
+          padding: 6px;
+          border-radius: 8px;
+          border: 1px solid rgba(255,255,255,0.2);
+          background: rgba(255,255,255,0.08);
+          color: rgba(255,255,255,0.7);
+          cursor: pointer;
+          transition: background 0.2s, color 0.2s;
+        }
+        .footer-btn:hover { background: rgba(255,255,255,0.18); color: white; }
+
+        /* ── Main ── */
+        .dash-main {
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          overflow: auto;
+          position: relative;
+          z-index: 10;
+        }
+
+        /* ── Topbar ── */
+        .dash-topbar {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 16px 24px;
+          background: rgba(255,255,255,0.10);
+          backdrop-filter: blur(16px);
+          -webkit-backdrop-filter: blur(16px);
+          border-bottom: 1px solid rgba(255,255,255,0.15);
+          transform: translateY(-20px);
+          opacity: 0;
+          transition: transform 0.6s cubic-bezier(0.22,1,0.36,1) 0.1s, opacity 0.6s ease 0.1s;
+        }
+        .dash-topbar.visible { transform: translateY(0); opacity: 1; }
+
+        .topbar-title { font-size: 15px; font-weight: 700; color: white; }
+        .topbar-sub { font-size: 11px; color: rgba(255,255,255,0.55); margin-top: 1px; }
+
+        .topbar-right { display: flex; align-items: center; gap: 10px; }
+        .search-bar {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          padding: 7px 16px;
+          border-radius: 999px;
+          border: 1px solid rgba(255,255,255,0.2);
+          background: rgba(255,255,255,0.1);
+          font-size: 12px;
+          color: rgba(255,255,255,0.5);
+          min-width: 220px;
+        }
+        .role-pill {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          padding: 6px 14px;
+          border-radius: 999px;
+          border: 1px solid rgba(255,255,255,0.2);
+          background: rgba(255,255,255,0.1);
+          font-size: 12px;
+          color: rgba(255,255,255,0.8);
+        }
+        .role-dot {
+          width: 7px; height: 7px;
+          border-radius: 50%;
+          background: rgba(255,255,255,0.5);
+        }
+
+        /* ── Content area ── */
+        .dash-content { padding: 20px 24px; }
+
+        /* ── Stat cards ── */
+        .stats-grid {
+          display: grid;
+          grid-template-columns: repeat(4, 1fr);
+          gap: 12px;
+          margin-bottom: 16px;
+        }
+
+        .stat-card {
+          padding: 16px;
+          border-radius: 16px;
+          background: rgba(255,255,255,0.12);
+          backdrop-filter: blur(16px);
+          -webkit-backdrop-filter: blur(16px);
+          border: 1px solid rgba(255,255,255,0.2);
+          box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+          opacity: 0;
+          transform: translateY(24px);
+          transition: opacity 0.5s ease, transform 0.5s ease, box-shadow 0.2s;
+        }
+        .stat-card:hover {
+          box-shadow: 0 12px 40px rgba(0,0,0,0.2);
+          transform: translateY(-2px) !important;
+          border-color: rgba(255,255,255,0.35);
+        }
+        .stat-card.visible { opacity: 1; transform: translateY(0); }
+        .stat-card.d1 { transition-delay: 0.2s; }
+        .stat-card.d2 { transition-delay: 0.28s; }
+        .stat-card.d3 { transition-delay: 0.36s; }
+        .stat-card.d4 { transition-delay: 0.44s; }
+
+        .stat-card-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 10px; }
+        .stat-label { font-size: 12px; font-weight: 600; color: white; }
+        .stat-sub { font-size: 10px; color: rgba(255,255,255,0.5); margin-top: 2px; }
+
+        .stat-badge {
+          display: flex;
+          align-items: center;
+          gap: 5px;
+          font-size: 10px;
+          padding: 4px 10px;
+          border-radius: 999px;
+          white-space: nowrap;
+          font-weight: 600;
+        }
+        .badge-green { background: rgba(134,239,172,0.2); color: #86efac; border: 1px solid rgba(134,239,172,0.3); }
+        .badge-gray  { background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.6); border: 1px solid rgba(255,255,255,0.15); }
+        .badge-orange{ background: rgba(253,186,116,0.2); color: #fbbf24; border: 1px solid rgba(251,191,36,0.3); }
+
+        .badge-dot { width: 6px; height: 6px; border-radius: 50%; }
+        .dot-green  { background: #86efac; }
+        .dot-gray   { background: rgba(255,255,255,0.45); }
+        .dot-orange { background: #fbbf24; }
+
+        .stat-value { font-size: 26px; font-weight: 700; color: white; margin: 4px 0; }
+        .stat-value.large { font-size: 30px; }
+        .stat-note { font-size: 10px; color: rgba(255,255,255,0.45); }
+
+        /* ── Bottom grid ── */
+        .bottom-grid {
+          display: grid;
+          gap: 12px;
+          grid-template-columns: 1fr 340px;
+        }
+
+        .glass-panel {
+          border-radius: 16px;
+          background: rgba(255,255,255,0.10);
+          backdrop-filter: blur(16px);
+          -webkit-backdrop-filter: blur(16px);
+          border: 1px solid rgba(255,255,255,0.18);
+          overflow: hidden;
+          opacity: 0;
+          transform: translateY(24px);
+          transition: opacity 0.5s ease, transform 0.5s ease;
+          box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        }
+        .glass-panel.visible { opacity: 1; transform: translateY(0); }
+        .glass-panel.d5 { transition-delay: 0.52s; }
+        .glass-panel.d6 { transition-delay: 0.6s; }
+
+        .panel-header {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 14px 16px;
+          border-bottom: 1px solid rgba(255,255,255,0.12);
+        }
+        .panel-title { font-size: 13px; font-weight: 700; color: white; }
+        .panel-sub { font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 2px; }
+
+        .panel-btn {
+          font-size: 11px;
+          padding: 6px 14px;
+          border-radius: 8px;
+          border: 1px solid rgba(255,255,255,0.2);
+          background: rgba(255,255,255,0.1);
+          color: rgba(255,255,255,0.75);
+          cursor: pointer;
+          transition: background 0.2s, color 0.2s;
+        }
+        .panel-btn:hover { background: rgba(255,255,255,0.2); color: white; }
+
+        .panel-demo-badge {
+          display: flex;
+          align-items: center;
+          gap: 5px;
+          font-size: 11px;
+          padding: 5px 12px;
+          border-radius: 999px;
+          border: 1px solid rgba(255,255,255,0.18);
+          color: rgba(255,255,255,0.6);
+          background: rgba(255,255,255,0.08);
+        }
+
+        .activity-row {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 12px 16px;
+          border-bottom: 1px solid rgba(255,255,255,0.08);
+          transition: background 0.2s;
+        }
+        .activity-row:last-child { border-bottom: none; }
+        .activity-row:hover { background: rgba(255,255,255,0.06); }
+        .activity-title { font-size: 12px; font-weight: 500; color: white; margin-bottom: 2px; }
+        .activity-meta { font-size: 11px; color: rgba(255,255,255,0.45); }
+        .logged-badge {
+          display: flex;
+          align-items: center;
+          gap: 5px;
+          font-size: 11px;
+          padding: 4px 12px;
+          border-radius: 999px;
+          border: 1px solid rgba(255,255,255,0.18);
+          color: rgba(255,255,255,0.55);
+          white-space: nowrap;
+          margin-left: 10px;
+        }
+        .logged-dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,0.4); }
+
+        .action-row {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 12px 16px;
+          border-bottom: 1px solid rgba(255,255,255,0.08);
+          cursor: pointer;
+          transition: background 0.2s;
+        }
+        .action-row:last-child { border-bottom: none; }
+        .action-row:hover { background: rgba(255,255,255,0.08); }
+        .action-title { font-size: 12px; font-weight: 600; color: white; margin-bottom: 2px; }
+        .action-sub { font-size: 11px; color: rgba(255,255,255,0.45); }
+        .action-badge {
+          display: flex;
+          align-items: center;
+          gap: 5px;
+          font-size: 11px;
+          padding: 4px 12px;
+          border-radius: 999px;
+          border: 1px solid rgba(255,255,255,0.2);
+          color: rgba(255,255,255,0.65);
+          white-space: nowrap;
+          margin-left: 10px;
+          background: rgba(255,255,255,0.08);
+        }
+
+        /* ── Pulse dot on active nav ── */
+        @keyframes pulse {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0.4; }
+        }
+        .pulse-dot {
+          width: 6px; height: 6px;
+          border-radius: 50%;
+          background: rgba(255,255,255,0.7);
+          animation: pulse 2s ease-in-out infinite;
+          margin-left: auto;
+        }
+
+        /* ── Number count-up shimmer on stat values ── */
+        @keyframes shimmer {
+          0% { opacity: 0.5; }
+          60% { opacity: 1; }
+          100% { opacity: 1; }
+        }
+        .stat-value { animation: shimmer 0.8s ease forwards; }
+      `}</style>
+
+      <div className="dash-root">
+        {/* Background blobs */}
+        <div className="dash-blob dash-blob-1" />
+        <div className="dash-blob dash-blob-2" />
+        <div className="dash-blob dash-blob-3" />
+        <div className="dash-blob dash-blob-4" />
+
+        {/* ── SIDEBAR ── */}
+        <aside className={`dash-sidebar ${mounted ? "visible" : ""}`}>
+          <div className="sidebar-brand">
+            <div className="brand-icon" />
             <div>
-              <p className="text-xs font-medium">Staff Account</p>
-              <span className="text-[11px] text-gray-400">Staff · owner@alloftech.demo</span>
+              <p className="brand-name">AllOfTech Export</p>
+              <p className="brand-sub">Management Dashboard</p>
             </div>
           </div>
-          <div className="flex gap-1.5">
-            <button className="flex-1 text-xs py-1.5 rounded-lg border border-borderColor text-gray-500 hover:bg-bgLight">Sign out</button>
-            <button className="flex-1 text-xs py-1.5 rounded-lg border border-borderColor text-gray-500 hover:bg-bgLight">Reset</button>
-          </div>
-        </div>
-      </aside>
 
-      {/* MAIN */}
-      <main className="flex-1 flex flex-col overflow-auto">
-        {/* Topbar */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-borderColor bg-card">
-          <div>
-            <p className="text-base font-medium">Dashboard</p>
-            <span className="text-xs text-gray-400">Overview / This month</span>
-          </div>
-          <div className="flex items-center gap-2.5">
-            <div className="flex items-center gap-2 px-4 py-1.5 rounded-full border border-borderColor bg-bgLight text-xs text-gray-400 min-w-[220px]">
-              🔍 Search buyers, invoices, documents...
-            </div>
-            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-borderColor text-xs">
-              <span className="w-2 h-2 rounded-full bg-gray-400 inline-block" /> Staff
-            </div>
-          </div>
-        </div>
+          <p className="sidebar-section-label">Workspace</p>
 
-        <div className="p-6">
-          {/* Stat Cards */}
-          <div className="grid grid-cols-4 gap-3 mb-5">
-            {stats.map((s) => (
-              <div key={s.label} className="bg-card border border-borderColor rounded-xl p-4">
-                <div className="flex justify-between items-start mb-2">
-                  <div>
-                    <p className="text-xs font-medium">{s.label}</p>
-                    <p className="text-[11px] text-gray-400">{s.sub}</p>
-                  </div>
-                  <span className={`flex items-center gap-1 text-[11px] px-2.5 py-1 rounded-full ${badgeStyle[s.badgeClass]}`}>
-                    <span className={`w-1.5 h-1.5 rounded-full inline-block ${dotColor[s.badgeClass]}`} />
-                    {s.badge}
-                  </span>
-                </div>
-                <p className={`font-medium my-1 ${s.large ? "text-3xl" : "text-2xl"}`}>{s.value}</p>
-                <p className="text-[11px] text-gray-400">{s.note}</p>
+          <nav className="sidebar-nav">
+            {navItems.map((item) => (
+              <div
+                key={item}
+                className={`nav-item ${activeNav === item ? "active" : ""}`}
+                onClick={() => setActiveNav(item)}
+              >
+                {item}
+                {activeNav === item && <span className="pulse-dot" />}
               </div>
             ))}
-          </div>
+          </nav>
 
-          {/* Bottom Grid */}
-          <div className="grid gap-3" style={{ gridTemplateColumns: "1fr 360px" }}>
-            {/* Recent Activity */}
-            <div className="bg-card border border-borderColor rounded-xl overflow-hidden">
-              <div className="flex items-center justify-between px-4 py-3 border-b border-borderColor">
-                <div>
-                  <p className="text-sm font-medium">Recent activity</p>
-                  <span className="text-xs text-gray-400">Last actions recorded in the demo workspace</span>
-                </div>
-                <button className="text-xs px-3 py-1.5 rounded-lg border border-borderColor hover:bg-bgLight">View documents</button>
+          <div className="sidebar-footer">
+            <div className="user-card">
+              <div className="user-avatar" />
+              <div>
+                <p className="user-name">Staff Account</p>
+                <p className="user-role">owner@alloftech.demo</p>
               </div>
-              {activities.map((a, i) => (
-                <div key={i} className="flex items-center justify-between px-4 py-3 border-b border-borderColor last:border-b-0">
-                  <div>
-                    <p className="text-sm font-medium">{a.title}</p>
-                    <p className="text-xs text-gray-400">{a.meta}</p>
-                  </div>
-                  <span className="flex items-center gap-1.5 text-xs px-3 py-1 rounded-full border border-borderColor text-gray-500 whitespace-nowrap ml-3">
-                    <span className="w-1.5 h-1.5 rounded-full bg-gray-400 inline-block" /> Logged
-                  </span>
-                </div>
-              ))}
             </div>
-
-            {/* Quick Actions */}
-            <div className="bg-card border border-borderColor rounded-xl overflow-hidden">
-              <div className="flex items-center justify-between px-4 py-3 border-b border-borderColor">
-                <div>
-                  <p className="text-sm font-medium">Quick actions</p>
-                  <span className="text-xs text-gray-400">Fast navigation for client walkthrough</span>
-                </div>
-                <span className="flex items-center gap-1.5 text-xs px-3 py-1 rounded-full border border-borderColor text-gray-500">
-                  <span className="w-1.5 h-1.5 rounded-full bg-gray-400 inline-block" /> Demo
-                </span>
-              </div>
-              {quickActions.map((q, i) => (
-                <div key={i} className="flex items-center justify-between px-4 py-3 border-b border-borderColor last:border-b-0">
-                  <div>
-                    <p className="text-sm font-medium">{q.title}</p>
-                    <p className="text-xs text-gray-400">{q.sub}</p>
-                  </div>
-                  <span className="flex items-center gap-1.5 text-xs px-3 py-1 rounded-full border border-borderColor text-gray-500 whitespace-nowrap ml-3">
-                    <span className="w-1.5 h-1.5 rounded-full bg-gray-400 inline-block" /> {q.badge}
-                  </span>
-                </div>
-              ))}
+            <div className="footer-btns">
+              <button className="footer-btn">Sign out</button>
+              <button className="footer-btn">Reset</button>
             </div>
           </div>
-        </div>
-      </main>
-    </div>
+        </aside>
+
+        {/* ── MAIN ── */}
+        <main className="dash-main">
+          {/* Topbar */}
+          <div className={`dash-topbar ${mounted ? "visible" : ""}`}>
+            <div>
+              <p className="topbar-title">Dashboard</p>
+              <p className="topbar-sub">Overview · This month</p>
+            </div>
+            <div className="topbar-right">
+              <div className="search-bar">
+                🔍 Search buyers, invoices, documents...
+              </div>
+              <div className="role-pill">
+                <span className="role-dot" /> Staff
+              </div>
+            </div>
+          </div>
+
+          <div className="dash-content">
+            {/* Stat Cards */}
+            <div className="stats-grid">
+              {stats.map((s, i) => {
+                const delay = ["d1","d2","d3","d4"][i];
+                const badgeMap = { green: "badge-green", gray: "badge-gray", orange: "badge-orange" };
+                const dotMap = { green: "dot-green", gray: "dot-gray", orange: "dot-orange" };
+                return (
+                  <div key={s.label} className={`stat-card ${delay} ${mounted ? "visible" : ""}`}>
+                    <div className="stat-card-top">
+                      <div>
+                        <p className="stat-label">{s.label}</p>
+                        <p className="stat-sub">{s.sub}</p>
+                      </div>
+                      <span className={`stat-badge ${badgeMap[s.badgeClass]}`}>
+                        <span className={`badge-dot ${dotMap[s.badgeClass]}`} />
+                        {s.badge}
+                      </span>
+                    </div>
+                    <p className={`stat-value ${s.large ? "large" : ""}`}>{s.value}</p>
+                    <p className="stat-note">{s.note}</p>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Bottom Grid */}
+            <div className="bottom-grid">
+              {/* Recent Activity */}
+              <div className={`glass-panel d5 ${mounted ? "visible" : ""}`}>
+                <div className="panel-header">
+                  <div>
+                    <p className="panel-title">Recent activity</p>
+                    <p className="panel-sub">Last actions recorded in the demo workspace</p>
+                  </div>
+                  <button className="panel-btn">View documents</button>
+                </div>
+                {activities.map((a, i) => (
+                  <div key={i} className="activity-row">
+                    <div>
+                      <p className="activity-title">{a.title}</p>
+                      <p className="activity-meta">{a.meta}</p>
+                    </div>
+                    <span className="logged-badge">
+                      <span className="logged-dot" /> Logged
+                    </span>
+                  </div>
+                ))}
+              </div>
+
+              {/* Quick Actions */}
+              <div className={`glass-panel d6 ${mounted ? "visible" : ""}`}>
+                <div className="panel-header">
+                  <div>
+                    <p className="panel-title">Quick actions</p>
+                    <p className="panel-sub">Fast navigation for client walkthrough</p>
+                  </div>
+                  <span className="panel-demo-badge">
+                    <span className="logged-dot" /> Demo
+                  </span>
+                </div>
+                {quickActions.map((q, i) => (
+                  <div key={i} className="action-row">
+                    <div>
+                      <p className="action-title">{q.title}</p>
+                      <p className="action-sub">{q.sub}</p>
+                    </div>
+                    <span className="action-badge">
+                      <span className="logged-dot" /> {q.badge}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </main>
+      </div>
+    </>
   );
 }
